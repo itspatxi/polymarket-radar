@@ -1,0 +1,264 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Polymarket Liquidity Radar</title>
+  <style>
+    :root { --bg:#0b0f17; --card:#121a29; --muted:#9fb0c7; --text:#e8eef7; --accent:#7dd3fc; --ok:#86efac; --warn:#fbbf24; --bad:#fb7185; }
+    *{ box-sizing:border-box; }
+    body{ margin:0; font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial; background:linear-gradient(180deg,#070a10, var(--bg)); color:var(--text); }
+    a{ color:var(--accent); text-decoration:none; }
+    .wrap{ max-width:1100px; margin:0 auto; padding:28px 18px 60px; }
+    header{ display:flex; gap:14px; align-items:center; justify-content:space-between; flex-wrap:wrap; }
+    .brand{ display:flex; align-items:center; gap:12px; }
+    .logo{ width:42px; height:42px; border-radius:14px; background: radial-gradient(circle at 30% 30%, #7dd3fc, #a78bfa 55%, #0b0f17 70%); box-shadow:0 10px 30px rgba(125,211,252,.18); }
+    .h1{ font-size:22px; font-weight:700; margin:0; }
+    .sub{ margin:4px 0 0; color:var(--muted); font-size:13px; }
+    .nav{ display:flex; gap:10px; flex-wrap:wrap; }
+    .btn{ background:transparent; border:1px solid rgba(255,255,255,.14); padding:10px 12px; border-radius:12px; color:var(--text); cursor:pointer; }
+    .btn:hover{ border-color: rgba(125,211,252,.45); }
+    .hero{ margin-top:22px; padding:20px; border-radius:18px; background: linear-gradient(135deg, rgba(125,211,252,.14), rgba(167,139,250,.10)); border:1px solid rgba(255,255,255,.10); }
+    .hero h2{ margin:0 0 8px; font-size:28px; }
+    .hero p{ margin:0; color:var(--muted); line-height:1.5; }
+    .grid{ display:grid; grid-template-columns: repeat(12, 1fr); gap:14px; margin-top:14px; }
+    .card{ grid-column: span 12; padding:16px; border-radius:18px; background:rgba(18,26,41,.9); border:1px solid rgba(255,255,255,.10); }
+    @media (min-width: 900px){
+      .card.span6{ grid-column: span 6; }
+      .card.span4{ grid-column: span 4; }
+    }
+    .kpi{ display:flex; align-items:baseline; justify-content:space-between; gap:12px; }
+    .kpi .v{ font-size:26px; font-weight:800; }
+    .kpi .l{ color:var(--muted); font-size:13px; }
+    .pill{ display:inline-flex; gap:8px; align-items:center; padding:6px 10px; border-radius:999px; font-size:12px; border:1px solid rgba(255,255,255,.12); color:var(--muted); }
+    .row{ display:flex; gap:10px; flex-wrap:wrap; margin-top:10px; }
+    select{ background:transparent; color:var(--text); border:1px solid rgba(255,255,255,.14); padding:10px 12px; border-radius:12px; }
+    .muted{ color:var(--muted); }
+    .tag{ font-size:12px; padding:4px 8px; border-radius:10px; border:1px solid rgba(255,255,255,.12); color:var(--muted); }
+    .hr{ height:1px; background:rgba(255,255,255,.10); margin:14px 0; }
+    .list{ display:grid; gap:10px; margin-top:10px; }
+    .item{ padding:12px; border-radius:14px; border:1px solid rgba(255,255,255,.10); background:rgba(11,15,23,.4); display:flex; justify-content:space-between; gap:12px; flex-wrap:wrap; }
+    .right{ display:flex; gap:10px; align-items:center; }
+    .badge{ font-weight:700; padding:6px 10px; border-radius:12px; }
+    .good{ background:rgba(134,239,172,.14); color:var(--ok); border:1px solid rgba(134,239,172,.25); }
+    .warn{ background:rgba(251,191,36,.14); color:var(--warn); border:1px solid rgba(251,191,36,.25); }
+    .bad{ background:rgba(251,113,133,.14); color:var(--bad); border:1px solid rgba(251,113,133,.25); }
+    footer{ margin-top:26px; color:var(--muted); font-size:13px; }
+    code{ background:rgba(255,255,255,.08); padding:2px 6px; border-radius:8px; }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <div class="brand">
+        <div class="logo"></div>
+        <div>
+          <p class="h1">Polymarket Liquidity Radar</p>
+          <p class="sub">EDA · Fabric Lakehouse (Bronze/Silver/Gold) · Power BI · Azure ML</p>
+        </div>
+      </div>
+      <div class="nav">
+        <button class="btn" onclick="jump('objetivo')">Objetivo</button>
+        <button class="btn" onclick="jump('dashboard')">Dashboard</button>
+        <button class="btn" onclick="jump('pipeline')">Pipeline</button>
+        <button class="btn" onclick="jump('ml')">IA</button>
+        <button class="btn" onclick="jump('repo')">Repo</button>
+      </div>
+    </header>
+
+    <section class="hero" id="objetivo">
+      <h2>Radar de liquidez y coste real de ejecución</h2>
+      <p>
+        Este proyecto monitoriza <b>spread</b>, <b>profundidad</b> y <b>slippage estimado</b> para tamaños típicos (10/50/200),
+        generando alertas de <b>mercado ilíquido</b> o <b>cambios bruscos</b>.
+      </p>
+      <div class="row">
+        <span class="pill">✔️ Útil para elegir mercados “ejecutables”</span>
+        <span class="pill">✔️ Datos capturados y versionados en Lakehouse</span>
+        <span class="pill">✔️ Preparado para Power BI + Azure ML</span>
+      </div>
+    </section>
+
+    <section class="grid" id="dashboard">
+      <div class="card span6">
+        <div class="kpi">
+          <div>
+            <div class="v" id="kpiSpread">0.00</div>
+            <div class="l">Spread (ask − bid)</div>
+          </div>
+          <span class="badge good" id="kpiLabel">OK</span>
+        </div>
+        <div class="hr"></div>
+        <div class="row">
+          <span class="tag">Demo UI (sin datos reales aún)</span>
+          <span class="muted">En el Paso 3 conectaremos el dataset real y estas tarjetas se alimentarán del lakehouse.</span>
+        </div>
+      </div>
+
+      <div class="card span6">
+        <div class="kpi">
+          <div>
+            <div class="v" id="kpiSlippage">0.00</div>
+            <div class="l">Slippage estimado (según tamaño)</div>
+          </div>
+          <div class="right">
+            <label class="muted" for="sizeSel">Tamaño</label>
+            <select id="sizeSel">
+              <option value="10">10</option>
+              <option value="50" selected>50</option>
+              <option value="200">200</option>
+            </select>
+          </div>
+        </div>
+        <div class="hr"></div>
+        <p class="muted" style="margin:0">
+          El slippage simula cuánto se te va el precio medio al ejecutar una orden de ese tamaño comiéndote niveles del libro.
+        </p>
+      </div>
+
+      <div class="card span4">
+        <div class="kpi">
+          <div>
+            <div class="v" id="kpiDepth">0</div>
+            <div class="l">Depth cerca del precio</div>
+          </div>
+        </div>
+        <div class="hr"></div>
+        <p class="muted" style="margin:0">Más depth → menos movimiento del precio al operar.</p>
+      </div>
+
+      <div class="card span4">
+        <div class="kpi">
+          <div>
+            <div class="v" id="kpiShock">No</div>
+            <div class="l">Shock (cambio brusco)</div>
+          </div>
+        </div>
+        <div class="hr"></div>
+        <p class="muted" style="margin:0">Reglas simples al principio; luego clasificación con Azure ML.</p>
+      </div>
+
+      <div class="card span4">
+        <div class="kpi">
+          <div>
+            <div class="v" id="kpiIlliquid">No</div>
+            <div class="l">Ilíquido</div>
+          </div>
+        </div>
+        <div class="hr"></div>
+        <p class="muted" style="margin:0">Se activa si spread/slippage suben o cae la profundidad.</p>
+      </div>
+
+      <div class="card span12">
+        <h3 style="margin:0 0 8px">Ranking (demo)</h3>
+        <p class="muted" style="margin:0 0 10px">
+          Aquí irá el ranking real por “calidad de mercado” (spread bajo, slippage bajo, depth alta). De momento: ejemplo.
+        </p>
+        <div class="list" id="rankList"></div>
+      </div>
+    </section>
+
+    <section class="card" id="pipeline" style="margin-top:14px;">
+      <h3 style="margin:0 0 10px">Pipeline (Fabric Lakehouse)</h3>
+      <div class="row">
+        <span class="pill"><b>Bronze</b> · snapshots crudos (JSON)</span>
+        <span class="pill"><b>Silver</b> · normalización (niveles del libro)</span>
+        <span class="pill"><b>Gold</b> · métricas (spread/depth/slippage + features)</span>
+      </div>
+      <div class="hr"></div>
+      <p class="muted" style="margin:0">
+        Próximos pasos: ingesta cada 5 minutos, cálculo de métricas y export listo para Power BI.
+      </p>
+    </section>
+
+    <section class="card" id="ml" style="margin-top:14px;">
+      <h3 style="margin:0 0 10px">IA (Azure ML)</h3>
+      <ul class="muted" style="margin:0; padding-left:18px; line-height:1.6;">
+        <li>Modelo 1: predicción de <code>spread</code> o <code>slippage_50</code> a +1h (GRU/LSTM).</li>
+        <li>Modelo 2 (alternativa): clasificación “se volverá ilíquido en la próxima hora”.</li>
+      </ul>
+    </section>
+
+    <section class="card" id="repo" style="margin-top:14px;">
+      <h3 style="margin:0 0 10px">Código y evidencias</h3>
+      <p class="muted" style="margin:0">
+        Repo con notebooks/scripts, PBIX (o capturas), y la memoria del proyecto (docs).
+        A medida que avancemos, enlazaremos aquí el informe de Power BI y los endpoints del modelo.
+      </p>
+    </section>
+
+    <footer>
+      <div class="hr"></div>
+      <div>© Proyecto académico · Landing en GitHub Pages</div>
+    </footer>
+  </div>
+
+  <script>
+    function jump(id){ document.getElementById(id).scrollIntoView({behavior:'smooth'}); }
+
+    // Demo local para que la landing "se mueva" desde el día 1.
+    // En el Paso 3 sustituiremos esto por datos reales servidos desde tu lakehouse/artefactos exportados.
+    const demoMarkets = [
+      {name:"Market A", spread:0.02, depth:980, sl10:0.003, sl50:0.010, sl200:0.030},
+      {name:"Market B", spread:0.06, depth:140, sl10:0.010, sl50:0.030, sl200:0.080},
+      {name:"Market C", spread:0.03, depth:540, sl10:0.004, sl50:0.012, sl200:0.040},
+      {name:"Market D", spread:0.01, depth:1200, sl10:0.002, sl50:0.006, sl200:0.020},
+    ];
+
+    function score(m){
+      // Más alto = mejor. Fórmula simple para la demo.
+      return (m.depth/1000) - (m.spread*3) - (m.sl50*4);
+    }
+
+    function labelFrom(m){
+      if(m.spread > 0.05 || m.depth < 200 || m.sl50 > 0.02) return {txt:"ILÍQUIDO", cls:"bad"};
+      if(m.spread > 0.03 || m.depth < 400 || m.sl50 > 0.015) return {txt:"OJO", cls:"warn"};
+      return {txt:"OK", cls:"good"};
+    }
+
+    function render(){
+      const size = document.getElementById("sizeSel").value;
+      const best = demoMarkets.slice().sort((a,b)=>score(b)-score(a))[0];
+      const lab = labelFrom(best);
+
+      document.getElementById("kpiSpread").textContent = best.spread.toFixed(2);
+      document.getElementById("kpiDepth").textContent = String(best.depth);
+      document.getElementById("kpiLabel").textContent = lab.txt;
+      document.getElementById("kpiLabel").className = "badge " + lab.cls;
+
+      const slip = size==="10" ? best.sl10 : size==="50" ? best.sl50 : best.sl200;
+      document.getElementById("kpiSlippage").textContent = slip.toFixed(3);
+
+      const illiquid = (lab.txt === "ILÍQUIDO") ? "Sí" : "No";
+      document.getElementById("kpiIlliquid").textContent = illiquid;
+
+      const shock = (Math.random() < 0.15) ? "Sí" : "No";
+      document.getElementById("kpiShock").textContent = shock;
+
+      const list = document.getElementById("rankList");
+      list.innerHTML = "";
+      demoMarkets
+        .slice()
+        .sort((a,b)=>score(b)-score(a))
+        .forEach((m, i)=>{
+          const l = labelFrom(m);
+          const el = document.createElement("div");
+          el.className = "item";
+          el.innerHTML = `
+            <div>
+              <b>#${i+1} · ${m.name}</b>
+              <div class="muted">spread ${m.spread.toFixed(2)} · depth ${m.depth} · slippage50 ${m.sl50.toFixed(3)}</div>
+            </div>
+            <div class="right">
+              <span class="badge ${l.cls}">${l.txt}</span>
+            </div>
+          `;
+          list.appendChild(el);
+        });
+    }
+
+    document.getElementById("sizeSel").addEventListener("change", render);
+    render();
+  </script>
+</body>
+</html>
